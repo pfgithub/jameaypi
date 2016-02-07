@@ -75,7 +75,7 @@ Events.prototype.out = function(data){
 
 var screenObj = new Canvas(screen);
 /**
- * The main canvas class
+ * The main canvas class. Do not change the width and height of the canvas.
  *
  * @class Canvas
  * @param {int} width The width
@@ -115,7 +115,7 @@ Canvas.prototype.drawImage = function(image,x,y){
 /**
  * Register a sprite to the canvas's SpriteList
  *
- * @method drawImage
+ * @method registerSprite
  * @param {Sprite} sprite The sprite to be added to the SpriteList
  * @return
  */
@@ -154,7 +154,7 @@ function convertImageToCanvas(image) {
  */
  
 /**
- * Fired the image loads
+ * Fired the image loads. Instead of using this event, you can use awaitImages to wait for all images in an array to load.
  *
  * @event load
  */
@@ -182,23 +182,66 @@ Image.prototype.draw = function(canvas, x, y){
   canvas.drawImage(this,x,y);
 };
 
+/**
+ * Lists of sprites that can be drawn quickly
+ *
+ * @class SpriteList
+ * @param {Canvas} canvas The canvas to draw your sprites to
+ * @param OR
+ * @param {Array(Canvas)} canvases The canvases to draw your sprites to formated in [canvas,canvas,canvas]. If no canvases are given, nothing will be drawn with draw()
+ * @namespace Game
+ * @constructor
+ */
 function SpriteList(canvas){
   this.sprites = [];
   this.canvas = canvas;
 }
+
+/**
+ * Add a sprite to the SpriteList
+ *
+ * @method addSprite
+ * @param {Sprite} sprite The sprite to be added to the SpriteList
+ * @return
+ */
 SpriteList.prototype.addSprite = function(sprite){
   this.sprites.push(sprite);
 };
-SpriteList.prototype.draw = function(){
+
+/**
+ * Draws all the sprites to be updated
+ *
+ * @method draw
+ * @param {Boolean} [update=false] Weather the sprites should have their images updated first. Disabling this can get better performance, only use when neccessary.
+ * @return
+ */
+SpriteList.prototype.draw = function(update){
   if(this.sprites.length == 0) return;
   this.sprites.forEach(function(sprite){
-    sprite.update();
-      
-    sprite.draw(this.canvas);
+    if(update) sprite.update();
+    
+    if(typeof this.canvas == "string"){
+      sprite.draw(this.canvas);
+    }else{
+      this.canvas.foreach(function(canva){
+        sprite.draw(canva);
+      });
+    }
   }.bind(this));
   return true;
 };
 
+
+/**
+ * Sprites. The basic object which has your character or monster or npc. It has an X and a Y to be moved around, and can be drawn in the canvas's spritelist
+ *
+ * @class Sprite
+ * @param {image} image The first image for the sprite. If this image is given before it is loaded, the sprite WILL NOT load properly. Make sure to load ALL your images before doing anything, or serious errors could occur.
+ * @param {int} x The starting x position of the sprite
+ * @param {int} y The starting y position of the sprite
+ * @namespace Game
+ * @constructor
+ */
 function Sprite(image,x,y){
   this.image = image;
   this.canvas = new Canvas(this.image.w,this.image.h);
@@ -209,19 +252,76 @@ function Sprite(image,x,y){
   this.update();
 }
 util.inherits(Sprite,events.EventEmitter);
+// not documented yet
 Sprite.prototype.draw = function(canvas){
   this.image.draw(canvas,this.x,this.y);
 };
-Sprite.prototype.update = function(callback){
+// not documented yet
+Sprite.prototype.update = function(image){
   this.canvas.clear();
+  if(image) this.image = image;
   return this.image.draw(this.canvas,0,0);
 };
 
+
+/**
+ * All the main events for your game to run. Handle any events with Game.events.on(event,callback). Call any events with Game.events.out(event,paramaters...)
+ *
+ * @class events
+ * @namespace Game
+ * @static
+ */
+/**
+ * When a key is first pressed
+ *
+ * @event keydown
+ * @param {String} key The key that was pressed formatted according to keys.json (Expect these to be changed)
+ */
+/**
+ * When a key is let go of
+ *
+ * @event keyup
+ * @param {String} key The key that was released formatted according to keys.json (Expect these to be changed)
+ */
+/**
+ * When the screen is resized. Make sure to redraw on this event and reformat your screen.
+ *
+ * @event resize
+ */
+/**
+ * Called when your game should draw
+ *
+ * @event draw
+ */
+/**
+ * Called when your game should update
+ *
+ * @event error
+ * @param {number} deltaTime How long (in seconds) since the last frame. Multiply it by your speed for constant movement (in px/s)
+ */
+
+/** 
+ * These methods can be accessed directly with Game.[method]
+ * 
+ * @class GLOBAL
+ * @static
+ */
+ 
+/**
+ * Waits for all the images in an array to load. 
+ *
+ * @method awaitImages
+ * @param {Array(Image)} images The images to load
+ * @param {Function()} callback Called when all the images load
+ * @return
+ */
 
 function awaitImages(images,callback){
   var counter = images.length;
   if(counter == 0) {callback(images);return;}
   images.forEach(function(image){
+    if(image.w) counter--;
+    if(counter == 0) {callback(images);return;}
     image.on('load',function(){
       counter --;
       
@@ -245,7 +345,7 @@ module.exports = {};
 module.exports.Canvas = Canvas;
 module.exports.screen = screenObj;
 module.exports.Sprite = Sprite;
-module.exports.Image = Image;
 module.exports.SpriteList = SpriteList;
+module.exports.Image = Image;
 module.exports.awaitImages = awaitImages;
 module.exports.events = ev;

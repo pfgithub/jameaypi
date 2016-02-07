@@ -1,0 +1,22 @@
+{
+  "name": "js-game-api",
+  "version": "1.0.0",
+  "description": "Javascript Game API with Sprites",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pfgithub/jaymeapi.git"
+  },
+  "keywords": [
+    "browserify"
+  ],
+  "author": "pfg",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/pfgithub/jaymeapi/issues"
+  },
+  "homepage": "https://github.com/pfgithub/jaymeapi#readme"
+}

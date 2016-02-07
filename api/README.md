@@ -1,0 +1,1 @@
+# Documentation can be generated in HTML with yuidoc (jsdoc not tested)
