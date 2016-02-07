@@ -112,23 +112,28 @@ Canvas.prototype.drawImage = function(image,x,y){
   catch(err) {console.log('Could not draw canvas',image,err);return false;}
 };
 
+/**
+ * Register a sprite to the canvas's SpriteList
+ *
+ * @method drawImage
+ * @param {Sprite} sprite The sprite to be added to the SpriteList
+ * @return
+ */
+
 Canvas.prototype.registerSprite = function(sprite){
   this.spriteList.addSprite(sprite);
 };
 
+/**
+ * Clear the canvas
+ *
+ * @method clear
+ * @return
+ */
+
 Canvas.prototype.clear = function(){
   this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 };
-
-/**
- * Do not load an image multiple times. Reuse your image variables
- *
- * @class Canvas
- * @param {int} width The width
- * @param {int} height The height
- * @namespace Game
- * @constructor
- */
 
 function convertImageToCanvas(image) {
 	var canvas = document.createElement("canvas");
@@ -139,6 +144,20 @@ function convertImageToCanvas(image) {
 	return canvas;
 }
 
+/**
+ * Images to be used in your sprites. Please load all your images with awaitImages(array,callback) before actually running any code. All events are outputted to Game.events.on in the awaitImages callback
+ *
+ * @class Image
+ * @param {url} url The url to the image. This can be in data:image format or an actuall https:// url
+ * @namespace Game
+ * @constructor
+ */
+ 
+/**
+ * Fired the image loads
+ *
+ * @event load
+ */
 function Image(url){
   this.img = document.createElement('img');
   this.img.src = url;
@@ -151,6 +170,14 @@ function Image(url){
   }.bind(this));
 }
 util.inherits(Image, events.EventEmitter);
+
+/**
+ * Draw the image to a canvas
+ *
+ * @method drawImage
+ * @param {Canvas} canvas The canvas to draw the image to (not a RenderingContext2d)
+ * @return
+ */
 Image.prototype.draw = function(canvas, x, y){
   canvas.drawImage(this,x,y);
 };
@@ -219,5 +246,6 @@ module.exports.Canvas = Canvas;
 module.exports.screen = screenObj;
 module.exports.Sprite = Sprite;
 module.exports.Image = Image;
+module.exports.SpriteList = SpriteList;
 module.exports.awaitImages = awaitImages;
 module.exports.events = ev;

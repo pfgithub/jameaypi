@@ -7,7 +7,8 @@
                 "Game": 1
             },
             "classes": {
-                "Game.Canvas": 1
+                "Game.Canvas": 1,
+                "Game.Image": 1
             },
             "fors": {},
             "namespaces": {
@@ -21,7 +22,8 @@
             "submodules": {},
             "elements": {},
             "classes": {
-                "Game.Canvas": 1
+                "Game.Canvas": 1,
+                "Game.Image": 1
             },
             "fors": {},
             "namespaces": {
@@ -29,7 +31,7 @@
             },
             "tag": "module",
             "file": "index.js",
-            "line": 113,
+            "line": 147,
             "description": "The game api"
         }
     },
@@ -45,8 +47,8 @@
             "module": "Game",
             "namespace": "Game",
             "file": "index.js",
-            "line": 113,
-            "description": "Do not load an image multiple times. Reuse your image variables",
+            "line": 77,
+            "description": "The main canvas class",
             "params": [
                 {
                     "name": "width",
@@ -60,9 +62,126 @@
                 }
             ],
             "is_constructor": 1
+        },
+        "Game.Image": {
+            "name": "Game.Image",
+            "shortname": "Game.Image",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Game",
+            "namespace": "Game",
+            "file": "index.js",
+            "line": 147,
+            "description": "Images to be used in your sprites. Please load all your images with awaitImages(array,callback) before actually running any code. All events are outputted to Game.events.on in the awaitImages callback",
+            "params": [
+                {
+                    "name": "url",
+                    "description": "The url to the image. This can be in data:image format or an actuall https:// url",
+                    "type": "Url"
+                }
+            ],
+            "is_constructor": 1
         }
     },
     "elements": {},
-    "classitems": [],
+    "classitems": [
+        {
+            "file": "index.js",
+            "line": 100,
+            "description": "Draw an image onto the canvas",
+            "itemtype": "method",
+            "name": "drawImage",
+            "params": [
+                {
+                    "name": "image",
+                    "description": "The image to be drawn to the canvas",
+                    "type": "Image"
+                },
+                {
+                    "name": "x",
+                    "description": "The x position to draw the image to",
+                    "type": "Int"
+                },
+                {
+                    "name": "y",
+                    "description": "The y position to draw the image to",
+                    "type": "Int"
+                }
+            ],
+            "return": {
+                "description": "Weather the image drawing succeeded or not. If image drawing did not succeed, it is likley that the image was not loaded yet. Please use awaitImages to house your image loading.",
+                "type": "Boolean"
+            },
+            "class": "Game.Canvas",
+            "module": "Game",
+            "namespace": "Game"
+        },
+        {
+            "file": "index.js",
+            "line": 115,
+            "description": "Register a sprite to the canvas's SpriteList",
+            "itemtype": "method",
+            "name": "drawImage",
+            "params": [
+                {
+                    "name": "sprite",
+                    "description": "The sprite to be added to the SpriteList",
+                    "type": "Sprite"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "Game.Canvas",
+            "module": "Game",
+            "namespace": "Game"
+        },
+        {
+            "file": "index.js",
+            "line": 127,
+            "description": "Clear the canvas",
+            "itemtype": "method",
+            "name": "clear",
+            "return": {
+                "description": ""
+            },
+            "class": "Game.Canvas",
+            "module": "Game",
+            "namespace": "Game"
+        },
+        {
+            "file": "index.js",
+            "line": 156,
+            "description": "Fired the image loads",
+            "itemtype": "event",
+            "name": "load",
+            "class": "Game.Image",
+            "module": "Game",
+            "namespace": "Game"
+        },
+        {
+            "file": "index.js",
+            "line": 174,
+            "description": "Draw the image to a canvas",
+            "itemtype": "method",
+            "name": "drawImage",
+            "params": [
+                {
+                    "name": "canvas",
+                    "description": "The canvas to draw the image to (not a RenderingContext2d)",
+                    "type": "Canvas"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "Game.Image",
+            "module": "Game",
+            "namespace": "Game"
+        }
+    ],
     "warnings": []
 }

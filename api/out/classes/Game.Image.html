@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Game.Canvas</title>
+    <title>Game.Image</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -78,12 +78,12 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1>Game.Canvas Class</h1>
+<h1>Game.Image Class</h1>
 <div class="box meta">
 
 
         <div class="foundat">
-            Defined in: <a href="../files/index.js.html#l77"><code>index.js:77</code></a>
+            Defined in: <a href="../files/index.js.html#l147"><code>index.js:147</code></a>
         </div>
 
             Module: <a href="../modules/Game.html">Game</a>
@@ -92,22 +92,19 @@
 
 
 <div class="box intro">
-    <p>The main canvas class</p>
+    <p>Images to be used in your sprites. Please load all your images with awaitImages(array,callback) before actually running any code. All events are outputted to Game.events.on in the awaitImages callback</p>
 
 </div>
 
     <div class="constructor">
         <h2>Constructor</h2>
-<div id="method_Game.Canvas" class="method item">
-    <h3 class="name"><code>Game.Canvas</code></h3>
+<div id="method_Game.Image" class="method item">
+    <h3 class="name"><code>Game.Image</code></h3>
 
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
                 <li class="arg">
-                        <code>width</code>
-                </li>
-                <li class="arg">
-                        <code>height</code>
+                        <code>url</code>
                 </li>
             </ul><span class="paren">)</span>
         </div>
@@ -122,7 +119,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/index.js.html#l77"><code>index.js:77</code></a>
+        <a href="../files/index.js.html#l147"><code>index.js:147</code></a>
         </p>
 
 
@@ -138,23 +135,12 @@
 
             <ul class="params-list">
                 <li class="param">
-                        <code class="param-name">width</code>
-                        <span class="type">Int</span>
+                        <code class="param-name">url</code>
+                        <span class="type">Url</span>
 
 
                     <div class="param-description">
-                        <p>The width</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">height</code>
-                        <span class="type">Int</span>
-
-
-                    <div class="param-description">
-                        <p>The height</p>
+                        <p>The url to the image. This can be in data:image format or an actuall https:// url</p>
 
                     </div>
 
@@ -172,6 +158,7 @@
         <li class="api-class-tab index"><a href="#index">Index</a></li>
 
             <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+            <li class="api-class-tab events"><a href="#events">Events</a></li>
     </ul>
 
     <div>
@@ -183,14 +170,6 @@
 
                     <ul class="index-list methods">
                             <li class="index-item method">
-                                <a href="#method_clear">clear</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_drawImage">drawImage</a>
-
-                            </li>
-                            <li class="index-item method">
                                 <a href="#method_drawImage">drawImage</a>
 
                             </li>
@@ -199,152 +178,28 @@
 
 
 
+                <div class="index-section events">
+                    <h3>Events</h3>
+
+                    <ul class="index-list events">
+                            <li class="index-item event">
+                                <a href="#event_load">load</a>
+
+                            </li>
+                    </ul>
+                </div>
         </div>
 
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
-<div id="method_clear" class="method item">
-    <h3 class="name"><code>clear</code></h3>
-
-        <span class="paren">()</span>
-
-        <span class="returns-inline">
-            <span class="type"></span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/index.js.html#l127"><code>index.js:127</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Clear the canvas</p>
-
-    </div>
-
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-            </div>
-        </div>
-
-
-</div>
 <div id="method_drawImage" class="method item">
     <h3 class="name"><code>drawImage</code></h3>
 
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
                 <li class="arg">
-                        <code>image</code>
-                </li>
-                <li class="arg">
-                        <code>x</code>
-                </li>
-                <li class="arg">
-                        <code>y</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-        <span class="returns-inline">
-            <span class="type">Boolean</span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/index.js.html#l100"><code>index.js:100</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Draw an image onto the canvas</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">image</code>
-                        <span class="type">Image</span>
-
-
-                    <div class="param-description">
-                        <p>The image to be drawn to the canvas</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">x</code>
-                        <span class="type">Int</span>
-
-
-                    <div class="param-description">
-                        <p>The x position to draw the image to</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">y</code>
-                        <span class="type">Int</span>
-
-
-                    <div class="param-description">
-                        <p>The y position to draw the image to</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Boolean</span>:
-                    <p>Weather the image drawing succeeded or not. If image drawing did not succeed, it is likley that the image was not loaded yet. Please use awaitImages to house your image loading.</p>
-
-            </div>
-        </div>
-
-
-</div>
-<div id="method_drawImage" class="method item">
-    <h3 class="name"><code>drawImage</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>sprite</code>
+                        <code>canvas</code>
                 </li>
             </ul><span class="paren">)</span>
         </div>
@@ -362,7 +217,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/index.js.html#l115"><code>index.js:115</code></a>
+        <a href="../files/index.js.html#l174"><code>index.js:174</code></a>
         </p>
 
 
@@ -370,7 +225,7 @@
     </div>
 
     <div class="description">
-        <p>Register a sprite to the canvas's SpriteList</p>
+        <p>Draw the image to a canvas</p>
 
     </div>
 
@@ -379,12 +234,12 @@
 
             <ul class="params-list">
                 <li class="param">
-                        <code class="param-name">sprite</code>
-                        <span class="type">Sprite</span>
+                        <code class="param-name">canvas</code>
+                        <span class="type">Canvas</span>
 
 
                     <div class="param-description">
-                        <p>The sprite to be added to the SpriteList</p>
+                        <p>The canvas to draw the image to (not a RenderingContext2d)</p>
 
                     </div>
 
@@ -405,6 +260,35 @@
 
 
 
+            <div id="events" class="api-class-tabpanel">
+                <h2 class="off-left">Events</h2>
+
+                    <div id="event_load" class="events item">
+                        <h3 class="name"><code>load</code></h3>
+                        <span class="type"></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/index.js.html#l156"><code>index.js:156</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Fired the image loads</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+            </div>
     </div>
 </div>
                     </div>
