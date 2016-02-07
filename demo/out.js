@@ -1113,6 +1113,16 @@ function Canvas(w,h){
   this.spriteList = new SpriteList(this);
 }
 
+/**
+ * Draw an image onto the canvas
+ *
+ * @method drawImage
+ * @param {Image} image The image to be drawn to the canvas
+ * @param {int} x The x position to draw the image to
+ * @param {int} y The y position to draw the image to
+ * @return {Boolean} Weather the image drawing succeeded or not. If image drawing did not succeed, it is likley that the image was not loaded yet. Please use awaitImages to house your image loading.
+ */
+
 Canvas.prototype.drawImage = function(image,x,y){
   try {this.ctx.drawImage(image.canvas, x,y);return true;}
   catch(err) {console.log('Could not draw canvas',image,err);return false;}
@@ -1374,10 +1384,11 @@ var Image = Game.Image;
 var screen = Game.screen;
 var Sprite = Game.Sprite;
 var Canvas = Game.Canvas;
+var awaitImages = Game.awaitImages;
 
 var image = new Image('https://i-msdn.sec.s-msft.com/dynimg/IC131527.gif');
 var o = 0;
-image.on('load',function(){
+awaitImages([image],function(){
   var sprite = new Sprite(image,10,10);
   screen.registerSprite(sprite);
   

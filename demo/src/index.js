@@ -3,10 +3,11 @@ var Image = Game.Image;
 var screen = Game.screen;
 var Sprite = Game.Sprite;
 var Canvas = Game.Canvas;
+var awaitImages = Game.awaitImages;
 
 var image = new Image('https://i-msdn.sec.s-msft.com/dynimg/IC131527.gif');
 var o = 0;
-image.on('load',function(){
+awaitImages([image],function(){
   var sprite = new Sprite(image,10,10);
   screen.registerSprite(sprite);
   
