@@ -1016,6 +1016,7 @@ function hasOwnProperty(obj, prop) {
 },{"./support/isBuffer":4,"_process":3,"inherits":2}],6:[function(require,module,exports){
 var util = require('util');
 var events = require('events');
+var keys = require('./keys.json');
 /**
  * The game api
  *
@@ -1069,17 +1070,26 @@ window.addEventListener("resize", function(){
   ev.out('resize');
 });
 
+document.addEventListener('keydown',function(e){
+  var key = keys[e.keyCode];
+  ev.out('keydown', key);
+});
+
+document.addEventListener('keyup',function(e){
+  var key = keys[e.keyCode];
+  ev.out('keyup', key);
+});
+
 document.body.appendChild(screen);
 document.body.appendChild(buffer);
 
 function Events(){this.x = 0;}
 util.inherits(Events, events.EventEmitter);
 Events.prototype.out = function(data){
-  this.emit(data);
+  this.emit.apply(this, arguments);
 };
 
 var screenObj = new Canvas(screen);
-var bufferObj = new Canvas(screen);
 /**
  * The main canvas class
  *
@@ -1099,11 +1109,21 @@ function Canvas(w,h){
   this.ctx = this.canvas.getContext("2d");
   this.w = this.canvas.width;
   this.h = this.canvas.height;
+  
+  this.spriteList = new SpriteList(this);
 }
 
 Canvas.prototype.drawImage = function(image,x,y){
   try {this.ctx.drawImage(image.canvas, x,y);return true;}
   catch(err) {console.log('Could not draw canvas',image,err);return false;}
+};
+
+Canvas.prototype.registerSprite = function(sprite){
+  this.spriteList.addSprite(sprite);
+};
+
+Canvas.prototype.clear = function(){
+  this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 };
 
 /**
@@ -1130,8 +1150,9 @@ function Image(url){
   this.img.src = url;
   this.img.addEventListener("load",function(){
     this.canvas = convertImageToCanvas(this.img);
-    this.w = this.img.clientWidth;
-    this.h = this.img.clientHeight;
+    this.w = this.img.width;
+    this.h = this.img.height;
+    
     this.emit('load');
   }.bind(this));
 }
@@ -1140,20 +1161,62 @@ Image.prototype.draw = function(canvas, x, y){
   canvas.drawImage(this,x,y);
 };
 
-function Sprite(image,x,y,w,h,ctx){
-  if(typeof image == "string") this.image = new Image(image);
-  else this.image = image;
-  this.canvas = new Canvas();
-  
+function SpriteList(canvas){
+  this.sprites = [];
+  this.canvas = canvas;
 }
-Sprite.prototype.draw = function(){
+SpriteList.prototype.addSprite = function(sprite){
+  this.sprites.push(sprite);
 };
-Sprite.prototype.update = function(){
+SpriteList.prototype.draw = function(){
+  if(this.sprites.length == 0) return;
+  this.sprites.forEach(function(sprite){
+    sprite.update();
+      
+    sprite.draw(this.canvas);
+  }.bind(this));
+  return true;
+};
+
+function Sprite(image,x,y){
+  this.image = image;
+  this.canvas = new Canvas(this.image.w,this.image.h);
+  
+  this.x = x;
+  this.y = y;
+  
+  this.update();
+}
+util.inherits(Sprite,events.EventEmitter);
+Sprite.prototype.draw = function(canvas){
+  this.image.draw(canvas,this.x,this.y);
+};
+Sprite.prototype.update = function(callback){
+  this.canvas.clear();
   return this.image.draw(this.canvas,0,0);
 };
 
-function BoxCollider(){
+
+function awaitImages(images,callback){
+  var counter = images.length;
+  if(counter == 0) {callback(images);return;}
+  images.forEach(function(image){
+    image.on('load',function(){
+      counter --;
+      
+      if(counter == 0) {callback(images);return;}
+    });
+  });
 }
+
+setInterval(onTimerTick, 33); // 33 milliseconds = ~ 30 frames per sec
+
+function onTimerTick() {
+  ev.out('update', 0.033);
+  ev.out('draw');
+}
+
+
 
 var ev = new Events();
 
@@ -1162,9 +1225,150 @@ module.exports.Canvas = Canvas;
 module.exports.screen = screenObj;
 module.exports.Sprite = Sprite;
 module.exports.Image = Image;
+module.exports.awaitImages = awaitImages;
 module.exports.events = ev;
 
-},{"events":1,"util":5}],7:[function(require,module,exports){
+},{"./keys.json":7,"events":1,"util":5}],7:[function(require,module,exports){
+module.exports={
+  "-100":"Credit: https://github.com/wesbos/keycodes",
+  "3": "break",
+  "8": "backspace / delete",
+  "9": "tab",
+  "12":"clear",
+  "13":"enter",
+  "16":"shift",
+  "17":"ctrl",
+  "18":"alt",
+  "19":"pause/break",
+  "20":"caps lock",
+  "27":"escape",
+  "32":"spacebar",
+  "33":"page up",
+  "34":"page down",
+  "35":"end",
+  "36":"home",
+  "37":"left arrow",
+  "38":"up arrow",
+  "39":"right arrow",
+  "40":"down arrow",
+  "41":"select",
+  "42":"print",
+  "43":"execute",
+  "44":"Print Screen",
+  "45":"insert",
+  "46":"delete",
+  "48":"0",
+  "49":"1",
+  "50":"2",
+  "51":"3",
+  "52":"4",
+  "53":"5",
+  "54":"6",
+  "55":"7",
+  "56":"8",
+  "57":"9",
+  "59":"semicolon (firefox), equals",
+  "60":"<",
+  "61":"equals (firefox)",
+  "63":"ß",
+  "65":"a",
+  "66":"b",
+  "67":"c",
+  "68":"d",
+  "69":"e",
+  "70":"f",
+  "71":"g",
+  "72":"h",
+  "73":"i",
+  "74":"j",
+  "75":"k",
+  "76":"l",
+  "77":"m",
+  "78":"n",
+  "79":"o",
+  "80":"p",
+  "81":"q",
+  "82":"r",
+  "83":"s",
+  "84":"t",
+  "85":"u",
+  "86":"v",
+  "87":"w",
+  "88":"x",
+  "89":"y",
+  "90":"z",
+  "91":"Windows Key / Left ⌘",
+  "92":"right window key",
+  "93":"Windows Menu / Right ⌘",
+  "96":"numpad 0",
+  "97":"numpad 1",
+  "98":"numpad 2",
+  "99":"numpad 3",
+  "100":"numpad 4",
+  "101":"numpad 5",
+  "102":"numpad 6",
+  "103":"numpad 7",
+  "104":"numpad 8",
+  "105":"numpad 9",
+  "106":"multiply",
+  "107":"add",
+  "108":"numpad period (firefox)",
+  "109":"subtract",
+  "110":"decimal point",
+  "111":"divide",
+  "112":"f1",
+  "113":"f2",
+  "114":"f3",
+  "115":"f4",
+  "116":"f5",
+  "117":"f6",
+  "118":"f7",
+  "119":"f8",
+  "120":"f9",
+  "121":"f10",
+  "122":"f11",
+  "123":"f12",
+  "124":"f13",
+  "125":"f14",
+  "126":"f15",
+  "127":"f16",
+  "128":"f17",
+  "129":"f18",
+  "130":"f19",
+  "144":"num lock",
+  "145":"scroll lock",
+  "163":"#",
+  "173":"minus (firefox), mute/unmute",
+  "174":"decrease volume level",
+  "175":"increase volume level",
+  "176":"next",
+  "177":"previous",
+  "178":"stop",
+  "179":"play/pause",
+  "180":"e"-"mail",
+  "181":"mute/unmute (firefox)",
+  "182":"decrease volume level (firefox)",
+  "183":"increase volume level (firefox)",
+  "186":"semi"-"colon / ñ",
+  "187":"equal sign",
+  "188":"comma",
+  "189":"dash",
+  "190":"period",
+  "191":"forward slash",
+  "192":"grave accent",
+  "194":"numpad period (chrome)",
+  "219":"open bracket",
+  "220":"back slash",
+  "221":"close bracket",
+  "222":"single quote",
+  "223":"`",
+  "224":"left or right ⌘ key (firefox)",
+  "225":"altgr",
+  "226":"< /git >",
+  "230":"GNOME Compose Key",
+  "255":"toggle touchpad"
+}
+},{}],8:[function(require,module,exports){
 var Game = require("../../api/index.js");
 var Image = Game.Image;
 var screen = Game.screen;
@@ -1172,10 +1376,65 @@ var Sprite = Game.Sprite;
 var Canvas = Game.Canvas;
 
 var image = new Image('https://i-msdn.sec.s-msft.com/dynimg/IC131527.gif');
+var o = 0;
 image.on('load',function(){
-  image.draw(screen,50,50);
+  var sprite = new Sprite(image,10,10);
+  screen.registerSprite(sprite);
+  
+  var speed = 500;
+  
+  var direction = {};
+  Game.events.on('keydown',function(key){
+    if(key == "left arrow"){
+      direction['left'] = true;
+    }
+    if(key == "right arrow"){
+      direction['right'] = true;
+    }
+    if(key == "up arrow"){
+      direction['up'] = true;
+    }
+    if(key == "down arrow"){
+      direction['down'] = true;
+    }
+  });
+  Game.events.on('keyup',function(key){
+    if(key == "left arrow"){
+      direction['left'] = false;
+    }
+    if(key == "right arrow"){
+      direction['right'] = false;
+    }
+    if(key == "up arrow"){
+      direction['up'] = false;
+    }
+    if(key == "down arrow"){
+      direction['down'] = false;
+    }
+  });
+  Game.events.on('update',function(deltaTime){
+    screen.clear();
+    //sprite.x += 100 * deltaTime;
+    if(direction['left']){
+      sprite.x -= speed * deltaTime;
+    }
+    if(direction['right']){
+      sprite.x += speed * deltaTime;
+    }
+    if(direction['up']){
+      sprite.y -= speed * deltaTime;
+    }
+    if(direction['down']){
+      sprite.y += speed * deltaTime;
+    }
+  });
+  Game.events.on('draw',function(){
+    screen.spriteList.draw();
+  });
+  Game.events.on('resize',function(){
+    
+  });
 });
-Game.events.on('resize',function(){
-  image.draw(screen,50,50);
-});
-},{"../../api/index.js":6}]},{},[7]);
+
+
+},{"../../api/index.js":6}]},{},[8]);

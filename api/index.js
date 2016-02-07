@@ -1,5 +1,6 @@
 var util = require('util');
 var events = require('events');
+var keys = require('./keys.json');
 /**
  * The game api
  *
@@ -53,17 +54,26 @@ window.addEventListener("resize", function(){
   ev.out('resize');
 });
 
+document.addEventListener('keydown',function(e){
+  var key = keys[e.keyCode];
+  ev.out('keydown', key);
+});
+
+document.addEventListener('keyup',function(e){
+  var key = keys[e.keyCode];
+  ev.out('keyup', key);
+});
+
 document.body.appendChild(screen);
 document.body.appendChild(buffer);
 
 function Events(){this.x = 0;}
 util.inherits(Events, events.EventEmitter);
 Events.prototype.out = function(data){
-  this.emit(data);
+  this.emit.apply(this, arguments);
 };
 
 var screenObj = new Canvas(screen);
-var bufferObj = new Canvas(screen);
 /**
  * The main canvas class
  *
@@ -83,11 +93,21 @@ function Canvas(w,h){
   this.ctx = this.canvas.getContext("2d");
   this.w = this.canvas.width;
   this.h = this.canvas.height;
+  
+  this.spriteList = new SpriteList(this);
 }
 
 Canvas.prototype.drawImage = function(image,x,y){
   try {this.ctx.drawImage(image.canvas, x,y);return true;}
   catch(err) {console.log('Could not draw canvas',image,err);return false;}
+};
+
+Canvas.prototype.registerSprite = function(sprite){
+  this.spriteList.addSprite(sprite);
+};
+
+Canvas.prototype.clear = function(){
+  this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 };
 
 /**
@@ -114,8 +134,9 @@ function Image(url){
   this.img.src = url;
   this.img.addEventListener("load",function(){
     this.canvas = convertImageToCanvas(this.img);
-    this.w = this.img.clientWidth;
-    this.h = this.img.clientHeight;
+    this.w = this.img.width;
+    this.h = this.img.height;
+    
     this.emit('load');
   }.bind(this));
 }
@@ -131,35 +152,55 @@ function SpriteList(canvas){
 SpriteList.prototype.addSprite = function(sprite){
   this.sprites.push(sprite);
 };
-SpriteList.prototype.draw = function(callback){
-  if(this.sprites.length == 0) {callback(true);return;}
+SpriteList.prototype.draw = function(){
+  if(this.sprites.length == 0) return;
   this.sprites.forEach(function(sprite){
     sprite.update();
       
     sprite.draw(this.canvas);
-  });
+  }.bind(this));
   return true;
 };
 
 function Sprite(image,x,y){
-  if(typeof image == "string") this.image = new Image(image);
-  else this.image = image;
-  this.canvas = new Canvas();
+  this.image = image;
+  this.canvas = new Canvas(this.image.w,this.image.h);
   
-  this.x = 0;
-  this.y = 0;
+  this.x = x;
+  this.y = y;
+  
+  this.update();
 }
 util.inherits(Sprite,events.EventEmitter);
 Sprite.prototype.draw = function(canvas){
   this.image.draw(canvas,this.x,this.y);
 };
 Sprite.prototype.update = function(callback){
+  this.canvas.clear();
   return this.image.draw(this.canvas,0,0);
 };
 
 
-function BoxCollider(){
+function awaitImages(images,callback){
+  var counter = images.length;
+  if(counter == 0) {callback(images);return;}
+  images.forEach(function(image){
+    image.on('load',function(){
+      counter --;
+      
+      if(counter == 0) {callback(images);return;}
+    });
+  });
 }
+
+setInterval(onTimerTick, 33); // 33 milliseconds = ~ 30 frames per sec
+
+function onTimerTick() {
+  ev.out('update', 0.033);
+  ev.out('draw');
+}
+
+
 
 var ev = new Events();
 
@@ -168,4 +209,5 @@ module.exports.Canvas = Canvas;
 module.exports.screen = screenObj;
 module.exports.Sprite = Sprite;
 module.exports.Image = Image;
+module.exports.awaitImages = awaitImages;
 module.exports.events = ev;

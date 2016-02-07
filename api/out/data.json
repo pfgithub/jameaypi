@@ -1,0 +1,68 @@
+{
+    "project": {},
+    "files": {
+        "index.js": {
+            "name": "index.js",
+            "modules": {
+                "Game": 1
+            },
+            "classes": {
+                "Game.Canvas": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "Game": 1
+            }
+        }
+    },
+    "modules": {
+        "Game": {
+            "name": "Game",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "Game.Canvas": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "Game": 1
+            },
+            "tag": "module",
+            "file": "index.js",
+            "line": 113,
+            "description": "The game api"
+        }
+    },
+    "classes": {
+        "Game.Canvas": {
+            "name": "Game.Canvas",
+            "shortname": "Game.Canvas",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Game",
+            "namespace": "Game",
+            "file": "index.js",
+            "line": 113,
+            "description": "Do not load an image multiple times. Reuse your image variables",
+            "params": [
+                {
+                    "name": "width",
+                    "description": "The width",
+                    "type": "Int"
+                },
+                {
+                    "name": "height",
+                    "description": "The height",
+                    "type": "Int"
+                }
+            ],
+            "is_constructor": 1
+        }
+    },
+    "elements": {},
+    "classitems": [],
+    "warnings": []
+}
