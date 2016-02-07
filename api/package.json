@@ -1,6 +1,6 @@
 {
   "name": "js-game-api",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "description": "Javascript Game API with Sprites",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pfgithub/jaymeapi.git"
+    "url": "git+https://github.com/pfgithub/jameaypi.git"
   },
   "keywords": [
     "browserify"
@@ -16,7 +16,8 @@
   "author": "pfg",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/pfgithub/jaymeapi/issues"
+    "url": "https://github.com/pfgithub/jameaypi/issues"
   },
-  "homepage": "https://github.com/pfgithub/jaymeapi#readme"
+  "homepage": "https://github.com/pfgithub/jameaypi#readme",
+  "tonicExample": "//js-game-api does NOT work on tonic. It is for browserify, which tonic does not support. Sorry."
 }

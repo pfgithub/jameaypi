@@ -1,0 +1,426 @@
+{
+    "project": {},
+    "files": {
+        "index.js": {
+            "name": "index.js",
+            "modules": {
+                "Game": 1
+            },
+            "classes": {
+                "Game.Canvas": 1,
+                "Game.Image": 1,
+                "Game.SpriteList": 1,
+                "Game.Sprite": 1,
+                "Game.events": 1,
+                "Game.GLOBAL": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "Game": 1
+            }
+        }
+    },
+    "modules": {
+        "Game": {
+            "name": "Game",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "Game.Canvas": 1,
+                "Game.Image": 1,
+                "Game.SpriteList": 1,
+                "Game.Sprite": 1,
+                "Game.events": 1,
+                "Game.GLOBAL": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "Game": 1
+            },
+            "tag": "module",
+            "file": "index.js",
+            "line": 303,
+            "description": "The game api"
+        }
+    },
+    "classes": {
+        "Game.Canvas": {
+            "name": "Game.Canvas",
+            "shortname": "Game.Canvas",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Game",
+            "namespace": "Game",
+            "file": "index.js",
+            "line": 77,
+            "description": "The main canvas class. Do not change the width and height of the canvas.",
+            "params": [
+                {
+                    "name": "width",
+                    "description": "The width",
+                    "type": "Int"
+                },
+                {
+                    "name": "height",
+                    "description": "The height",
+                    "type": "Int"
+                }
+            ],
+            "is_constructor": 1
+        },
+        "Game.Image": {
+            "name": "Game.Image",
+            "shortname": "Game.Image",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Game",
+            "namespace": "Game",
+            "file": "index.js",
+            "line": 147,
+            "description": "Images to be used in your sprites. Please load all your images with awaitImages(array,callback) before actually running any code. All events are outputted to Game.events.on in the awaitImages callback",
+            "params": [
+                {
+                    "name": "url",
+                    "description": "The url to the image. This can be in data:image format or an actuall https:// url",
+                    "type": "Url"
+                }
+            ],
+            "is_constructor": 1
+        },
+        "Game.SpriteList": {
+            "name": "Game.SpriteList",
+            "shortname": "Game.SpriteList",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Game",
+            "namespace": "Game",
+            "file": "index.js",
+            "line": 185,
+            "description": "Lists of sprites that can be drawn quickly",
+            "params": [
+                {
+                    "name": "canvas",
+                    "description": "The canvas to draw your sprites to",
+                    "type": "Canvas"
+                },
+                {
+                    "name": "OR",
+                    "description": ""
+                },
+                {
+                    "name": "canvases",
+                    "description": "The canvases to draw your sprites to formated in [canvas,canvas,canvas]. If no canvases are given, nothing will be drawn with draw()",
+                    "type": "Array(Canvas)"
+                }
+            ],
+            "is_constructor": 1
+        },
+        "Game.Sprite": {
+            "name": "Game.Sprite",
+            "shortname": "Game.Sprite",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Game",
+            "namespace": "Game",
+            "file": "index.js",
+            "line": 235,
+            "description": "Sprites. The basic object which has your character or monster or npc. It has an X and a Y to be moved around, and can be drawn in the canvas's spritelist",
+            "params": [
+                {
+                    "name": "image",
+                    "description": "The first image for the sprite. If this image is given before it is loaded, the sprite WILL NOT load properly. Make sure to load ALL your images before doing anything, or serious errors could occur.",
+                    "type": "Image"
+                },
+                {
+                    "name": "x",
+                    "description": "The starting x position of the sprite",
+                    "type": "Int"
+                },
+                {
+                    "name": "y",
+                    "description": "The starting y position of the sprite",
+                    "type": "Int"
+                }
+            ],
+            "is_constructor": 1
+        },
+        "Game.events": {
+            "name": "Game.events",
+            "shortname": "Game.events",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Game",
+            "namespace": "Game",
+            "file": "index.js",
+            "line": 267,
+            "description": "All the main events for your game to run. Handle any events with Game.events.on(event,callback). Call any events with Game.events.out(event,paramaters...)",
+            "static": 1
+        },
+        "Game.GLOBAL": {
+            "name": "Game.GLOBAL",
+            "shortname": "GLOBAL",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Game",
+            "namespace": "Game",
+            "file": "index.js",
+            "line": 303,
+            "description": "These methods can be accessed directly with Game.[method]",
+            "static": 1
+        }
+    },
+    "elements": {},
+    "classitems": [
+        {
+            "file": "index.js",
+            "line": 100,
+            "description": "Draw an image onto the canvas",
+            "itemtype": "method",
+            "name": "drawImage",
+            "params": [
+                {
+                    "name": "image",
+                    "description": "The image to be drawn to the canvas",
+                    "type": "Image"
+                },
+                {
+                    "name": "x",
+                    "description": "The x position to draw the image to",
+                    "type": "Int"
+                },
+                {
+                    "name": "y",
+                    "description": "The y position to draw the image to",
+                    "type": "Int"
+                }
+            ],
+            "return": {
+                "description": "Weather the image drawing succeeded or not. If image drawing did not succeed, it is likley that the image was not loaded yet. Please use awaitImages to house your image loading.",
+                "type": "Boolean"
+            },
+            "class": "Game.Canvas",
+            "module": "Game",
+            "namespace": "Game"
+        },
+        {
+            "file": "index.js",
+            "line": 115,
+            "description": "Register a sprite to the canvas's SpriteList",
+            "itemtype": "method",
+            "name": "registerSprite",
+            "params": [
+                {
+                    "name": "sprite",
+                    "description": "The sprite to be added to the SpriteList",
+                    "type": "Sprite"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "Game.Canvas",
+            "module": "Game",
+            "namespace": "Game"
+        },
+        {
+            "file": "index.js",
+            "line": 127,
+            "description": "Clear the canvas",
+            "itemtype": "method",
+            "name": "clear",
+            "return": {
+                "description": ""
+            },
+            "class": "Game.Canvas",
+            "module": "Game",
+            "namespace": "Game"
+        },
+        {
+            "file": "index.js",
+            "line": 156,
+            "description": "Fired the image loads. Instead of using this event, you can use awaitImages to wait for all images in an array to load.",
+            "itemtype": "event",
+            "name": "load",
+            "class": "Game.Image",
+            "module": "Game",
+            "namespace": "Game"
+        },
+        {
+            "file": "index.js",
+            "line": 174,
+            "description": "Draw the image to a canvas",
+            "itemtype": "method",
+            "name": "drawImage",
+            "params": [
+                {
+                    "name": "canvas",
+                    "description": "The canvas to draw the image to (not a RenderingContext2d)",
+                    "type": "Canvas"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "Game.Image",
+            "module": "Game",
+            "namespace": "Game"
+        },
+        {
+            "file": "index.js",
+            "line": 200,
+            "description": "Add a sprite to the SpriteList",
+            "itemtype": "method",
+            "name": "addSprite",
+            "params": [
+                {
+                    "name": "sprite",
+                    "description": "The sprite to be added to the SpriteList",
+                    "type": "Sprite"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "Game.SpriteList",
+            "module": "Game",
+            "namespace": "Game"
+        },
+        {
+            "file": "index.js",
+            "line": 211,
+            "description": "Draws all the sprites to be updated",
+            "itemtype": "method",
+            "name": "draw",
+            "params": [
+                {
+                    "name": "update",
+                    "description": "Weather the sprites should have their images updated first. Disabling this can get better performance, only use when neccessary.",
+                    "type": "Boolean",
+                    "optional": true,
+                    "optdefault": "false"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "Game.SpriteList",
+            "module": "Game",
+            "namespace": "Game"
+        },
+        {
+            "file": "index.js",
+            "line": 274,
+            "description": "When a key is first pressed",
+            "itemtype": "event",
+            "name": "keydown",
+            "params": [
+                {
+                    "name": "key",
+                    "description": "The key that was pressed formatted according to keys.json (Expect these to be changed)",
+                    "type": "String"
+                }
+            ],
+            "class": "Game.events",
+            "module": "Game",
+            "namespace": "Game"
+        },
+        {
+            "file": "index.js",
+            "line": 280,
+            "description": "When a key is let go of",
+            "itemtype": "event",
+            "name": "keyup",
+            "params": [
+                {
+                    "name": "key",
+                    "description": "The key that was released formatted according to keys.json (Expect these to be changed)",
+                    "type": "String"
+                }
+            ],
+            "class": "Game.events",
+            "module": "Game",
+            "namespace": "Game"
+        },
+        {
+            "file": "index.js",
+            "line": 286,
+            "description": "When the screen is resized. Make sure to redraw on this event and reformat your screen.",
+            "itemtype": "event",
+            "name": "resize",
+            "class": "Game.events",
+            "module": "Game",
+            "namespace": "Game"
+        },
+        {
+            "file": "index.js",
+            "line": 291,
+            "description": "Called when your game should draw",
+            "itemtype": "event",
+            "name": "draw",
+            "class": "Game.events",
+            "module": "Game",
+            "namespace": "Game"
+        },
+        {
+            "file": "index.js",
+            "line": 296,
+            "description": "Called when your game should update",
+            "itemtype": "event",
+            "name": "error",
+            "params": [
+                {
+                    "name": "deltaTime",
+                    "description": "How long (in seconds) since the last frame. Multiply it by your speed for constant movement (in px/s)",
+                    "type": "Number"
+                }
+            ],
+            "class": "Game.events",
+            "module": "Game",
+            "namespace": "Game"
+        },
+        {
+            "file": "index.js",
+            "line": 310,
+            "description": "Waits for all the images in an array to load.",
+            "itemtype": "method",
+            "name": "awaitImages",
+            "params": [
+                {
+                    "name": "images",
+                    "description": "The images to load",
+                    "type": "Array(Image)"
+                },
+                {
+                    "name": "callback",
+                    "description": "Called when all the images load",
+                    "type": "Function()"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "Game.GLOBAL",
+            "module": "Game",
+            "namespace": "Game"
+        }
+    ],
+    "warnings": []
+}
