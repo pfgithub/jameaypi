@@ -5,27 +5,38 @@ var Sprite = Game.Sprite;
 var Canvas = Game.Canvas;
 var awaitImages = Game.awaitImages;
 
-var image = new Image('https://i-msdn.sec.s-msft.com/dynimg/IC131527.gif');
+var playerFacingLeft = new Image('images/Idle.png');
+var playerFacingRight = new Image('images/IdleRight.png');
+var floor = new Image('images/Floor.png');
 var o = 0;
-awaitImages([image],function(){
-  var sprite = new Sprite(image,10,10);
-  screen.registerSprite(sprite);
+awaitImages([playerFacingRight,playerFacingLeft,floor],function(){
+  var sprite = new Sprite(playerFacingLeft,10,10);
+  screen.registerSprite(sprite, "object");
+  var floorSprite = new Sprite(floor,10,300);
+  screen.registerSprite(floorSprite, "background");
+  sprite.do.jump = function(){
+    direction['jump'] = true;
+  };
   
-  var speed = 500;
+  var velocity = 0;
+  var velocityX = 0;
+  
+  var speed = 100;
   
   var direction = {};
   Game.events.on('keydown',function(key){
-    if(key == "left arrow"){
-      direction['left'] = true;
-    }
     if(key == "right arrow"){
       direction['right'] = true;
+      sprite.image = playerFacingRight;
     }
     if(key == "up arrow"){
-      direction['up'] = true;
+      if(sprite.collision.colliding()){
+        velocity = -100;
+      }
     }
-    if(key == "down arrow"){
-      direction['down'] = true;
+    if(key == "left arrow"){
+      direction['left'] = true;
+      sprite.image = playerFacingLeft;
     }
   });
   Game.events.on('keyup',function(key){
@@ -34,12 +45,6 @@ awaitImages([image],function(){
     }
     if(key == "right arrow"){
       direction['right'] = false;
-    }
-    if(key == "up arrow"){
-      direction['up'] = false;
-    }
-    if(key == "down arrow"){
-      direction['down'] = false;
     }
   });
   Game.events.on('update',function(deltaTime){
@@ -51,15 +56,14 @@ awaitImages([image],function(){
     if(direction['right']){
       sprite.x += speed * deltaTime;
     }
-    if(direction['up']){
-      sprite.y -= speed * deltaTime;
-    }
-    if(direction['down']){
-      sprite.y += speed * deltaTime;
+    sprite.y += velocity * deltaTime;
+    velocity += 5;
+    if(sprite.collision.onGround()){
+      velocity = 0;
     }
   });
   Game.events.on('draw',function(){
-    screen.spriteList.draw();
+    screen.spriteList.draw(true);
   });
   Game.events.on('resize',function(){
     

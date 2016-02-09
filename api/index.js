@@ -57,11 +57,13 @@ window.addEventListener("resize", function(){
 document.addEventListener('keydown',function(e){
   var key = keys[e.keyCode];
   ev.out('keydown', key);
+  ev.out('keydown-'+key);
 });
 
 document.addEventListener('keyup',function(e){
   var key = keys[e.keyCode];
   ev.out('keyup', key);
+  ev.out('keyup-'+key);
 });
 
 document.body.appendChild(screen);
@@ -120,8 +122,12 @@ Canvas.prototype.drawImage = function(image,x,y){
  * @return
  */
 
-Canvas.prototype.registerSprite = function(sprite){
-  this.spriteList.addSprite(sprite);
+Canvas.prototype.registerSprite = function(sprite,collisionType){
+  this.spriteList.addSprite(sprite,collisionType);
+};
+
+Canvas.prototype.registerCollider = function(collider){
+  this.colliderList.addCollider(collider);
 };
 
 /**
@@ -181,6 +187,17 @@ util.inherits(Image, events.EventEmitter);
 Image.prototype.draw = function(canvas, x, y){
   canvas.drawImage(this,x,y);
 };
+function Size(w,h){
+  this.w = w;
+  this.h = h;
+  this.canvas = document.createElement("canvas");
+  this.canvas.width = this.w;
+  this.canvas.height = this.h;
+}
+util.inherits(Size,events.EventEmitter);
+Size.prototype.draw = function(canvas,x,y){
+  this.emit("draw",canvas,x,y);
+};
 
 /**
  * Lists of sprites that can be drawn quickly
@@ -195,6 +212,7 @@ Image.prototype.draw = function(canvas, x, y){
 function SpriteList(canvas){
   this.sprites = [];
   this.canvas = canvas;
+  this.colliderList = new ColliderList();
 }
 
 /**
@@ -204,8 +222,9 @@ function SpriteList(canvas){
  * @param {Sprite} sprite The sprite to be added to the SpriteList
  * @return
  */
-SpriteList.prototype.addSprite = function(sprite){
+SpriteList.prototype.addSprite = function(sprite,colliderType){
   this.sprites.push(sprite);
+  sprite.onSpriteListed(this,colliderType);
 };
 
 /**
@@ -232,6 +251,13 @@ SpriteList.prototype.draw = function(update){
 };
 
 
+function ColliderList(){
+  this.colliders = [];
+}
+ColliderList.prototype.addCollider = function(collider){
+  this.colliders.push(collider);
+};
+
 /**
  * Sprites. The basic object which has your character or monster or npc. It has an X and a Y to be moved around, and can be drawn in the canvas's spritelist
  *
@@ -249,10 +275,20 @@ function Sprite(image,x,y){
   this.x = x;
   this.y = y;
   
+  this.do = {};
+  this.collision = "Add your sprite to a SpriteList for collision";
+  
   this.update();
 }
 util.inherits(Sprite,events.EventEmitter);
 // not documented yet
+Sprite.prototype.onSpriteListed = function(spriteList,colliderType){
+  this.collision = new BoxCollider(spriteList,this.x,this.y,this.image.w,this.image.h,colliderType);
+  this.collision.on('updateLocations',function(){
+    this.collision.update(this.x,this.y,this.image.w,this.image.h);
+  }.bind(this));
+};
+
 Sprite.prototype.draw = function(canvas){
   this.image.draw(canvas,this.x,this.y);
 };
@@ -337,6 +373,60 @@ function onTimerTick() {
   ev.out('draw');
 }
 
+function BoxCollider(spriteList,x,y,w,h,colliderType){
+  this.colliderList = spriteList.colliderList;
+  this.x = x;
+  this.y = y;
+  this.w = w;
+  this.h = h;
+  this.colliderType = colliderType ? colliderType : "background"; // none, background, or object
+  this.colliderList.addCollider(this);
+}
+util.inherits(BoxCollider,events.EventEmitter);
+BoxCollider.prototype.colliding = function(){
+  this.emit('updateLocations');
+  if(this.colliderType == "object"){
+    var collided = this.colliderList.colliders.some(function(collider,i){
+      if(collider == this) return false;
+      if(
+        this.x < collider.x + collider.w &&
+        this.x + this.w > collider.x &&
+        this.y < collider.y + collider.h &&
+        this.h + this.y > collider.y
+      ){
+        return true;
+      }else return false;
+    }.bind(this));
+    return collided;
+  }else{
+    throw new Error("Collider type " + this.colliderList +" can not be on the ground. Remove this check");
+  }
+};
+BoxCollider.prototype.onGround = function(){
+  this.emit('updateLocations');
+  if(this.colliderType == "object"){
+    var collided = this.colliderList.colliders.some(function(collider,i){
+      if(collider == this) return false;
+      if(
+        this.x < collider.x + collider.w &&
+        this.x + this.w > collider.x &&
+        this.y < collider.y + collider.h &&
+        this.h + this.y > collider.y // wip don't worry about me
+      ){
+        return true;
+      }else return false;
+    }.bind(this));
+    return collided;
+  }else{
+    throw new Error("Collider type " + this.colliderList +" can not be on the ground. Remove this check");
+  }
+};
+BoxCollider.prototype.update = function(x,y,w,h){
+  this.x = x;
+  this.y = y;
+  this.w = w;
+  this.h = h;
+};
 
 
 var ev = new Events();
