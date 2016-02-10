@@ -33,14 +33,14 @@ awaitImages([playerFacingRight,playerFacingLeft,floor],function(){
   Game.events.on('keydown',function(key){
     if(key == "right arrow"){
       direction['right'] = true;
-      sprite.image = playerFacingRight;
+      sprite.update(playerFacingRight);
     }
     if(key == "up arrow"){
       toJump = true;
     }
     if(key == "left arrow"){
       direction['left'] = true;
-      sprite.image = playerFacingLeft;
+      sprite.update(playerFacingLeft);
     }
   });
   Game.events.on('keyup',function(key){
@@ -77,7 +77,7 @@ awaitImages([playerFacingRight,playerFacingLeft,floor],function(){
   });
   Game.events.on('draw',function(){
     screen.clear();
-    screen.spriteList.draw(true);
+    screen.spriteList.draw();
   });
   Game.events.on('resize',function(){
     

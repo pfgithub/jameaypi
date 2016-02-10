@@ -87,6 +87,38 @@ var screenObj = new Canvas(screen);
  * @namespace Game
  * @constructor
  */
+ 
+/**
+ * Width
+ *
+ * @property w
+ * @type Number
+ * @default "w"
+ */
+ 
+/**
+ * Height
+ *
+ * @property h
+ * @type Number
+ * @default "h"
+ */
+ 
+/**
+ * The canvas's official SpriteList !! Organization WIP
+ *
+ * @property spriteList
+ * @type SpriteList
+ * @default "new SpriteList(this)"
+ */
+ 
+/**
+ * Screen drawing offset position. This determines the ammount all drawings to this canvas will be offset by
+ *
+ * @property camera
+ * @type Camera
+ * @default "new Camera(0,0)"
+ */
 function Canvas(w,h){
   if(typeof w != "number")this.canvas = w;
   else{
@@ -100,10 +132,7 @@ function Canvas(w,h){
   
   this.spriteList = new SpriteList(this);
   
-  this.camera = {
-    x: 0,
-    y: 0
-  };
+  this.camera = new Camera(0,0);
 }
 
 /**
@@ -133,9 +162,25 @@ Canvas.prototype.registerSprite = function(sprite,collisionType){
   this.spriteList.addSprite(sprite,collisionType);
 };
 
+/**
+ * Register multiple sprites to the canvas's SpriteList (UNTESTED)
+ *
+ * @method registerSprites
+ * @param {Array(Sprite)} sprites The sprites to be added to the SpriteList
+ * @return
+ */
+
 Canvas.prototype.registerSprites = function(sprites,collisionType){
   sprites.forEach(function(sprite){this.spriteList.addSprite(sprite,collisionType);});
 };
+
+/**
+ * Register a collider to the canvas's ColliderList !! Organization WIP
+ *
+ * @method registerSprite
+ * @param {Sprite} sprite The sprite to be added to the SpriteList
+ * @return
+ */
 
 Canvas.prototype.registerCollider = function(collider){
   this.colliderList.addCollider(collider);
@@ -175,6 +220,23 @@ function convertImageToCanvas(image) {
  *
  * @event load
  */
+ 
+/**
+ * Width
+ *
+ * @property w
+ * @type Number
+ * @default "w"
+ */
+ 
+/**
+ * Height
+ *
+ * @property h
+ * @type Number
+ * @default "h"
+ */
+ 
 function Image(url){
   this.img = document.createElement('img');
   this.img.src = url;
@@ -220,6 +282,14 @@ Size.prototype.draw = function(canvas,x,y){
  * @namespace Game
  * @constructor
  */
+ 
+/**
+ * The ColliderList for the SpriteList !! Organization WIP
+ *
+ * @property colliderList
+ * @type ColliderList
+ * @default "new ColliderList()"
+ */
 function SpriteList(canvas){
   this.sprites = [];
   this.canvas = canvas;
@@ -243,15 +313,16 @@ SpriteList.prototype.addSprite = function(sprite,colliderType){
  *
  * @method draw
  * @param {Boolean} [update=false] Weather the sprites should have their images updated first. Disabling this can get better performance, only use when neccessary.
+ * @param {Canvas} [canvas=this.canvas] A custom canvas to draw the spritelist to. Defaults to the canvas you instantiated it with.
  * @return
  */
-SpriteList.prototype.draw = function(update){
+SpriteList.prototype.draw = function(update, canvas){
   if(this.sprites.length == 0) return;
   this.sprites.forEach(function(sprite){
     if(update) sprite.update();
     
     //if(this.canvas.prototype == [].prototype){
-      sprite.draw(this.canvas);
+      sprite.draw(canvas ? canvas : this.canvas);
     //}else{
     //  this.canvas.forEach(function(canva){
     //    sprite.draw(canva);
@@ -261,16 +332,43 @@ SpriteList.prototype.draw = function(update){
   return true;
 };
 
+/**
+ * A list of colliders for easy collision detection
+ *
+ * @class ColliderList
+ * @param {Canvas} canvas The canvas to draw your sprites to
+ * @param OR
+ * @param {Array(Canvas)} canvases The canvases to draw your sprites to formated in [canvas,canvas,canvas]. If no canvases are given, nothing will be drawn with draw()
+ * @namespace Game
+ * @constructor
+ */
 
 function ColliderList(){
   this.colliders = [];
 }
+
+/**
+ * Adds a collider to the ColliderList
+ *
+ * @method draw
+ * @param {Collider} collider The collider to add. It must comply with the collider rules.
+ * @return
+ */
 ColliderList.prototype.addCollider = function(collider){
   this.colliders.push(collider);
 };
 
+function Camera(x,y){
+  this.x = x;
+  this.y = y;
+}
+Camera.prototype.centerOn = function(sprite,canvas){
+  this.camera.x = -sprite.x + canvas.w / 2 - sprite.image.w/2;
+  this.camera.y = -sprite.y + canvas.h / 2 - sprite.image.h/2;
+};
+
 /**
- * Sprites. The basic object which has your character or monster or npc. It has an X and a Y to be moved around, and can be drawn in the canvas's spritelist
+ * Sprites. The basic object which has your character, platform, monster, or npc. It has an X and a Y to be moved around, and can be drawn in the canvas's spritelist
  *
  * @class Sprite
  * @param {image} image The first image for the sprite. If this image is given before it is loaded, the sprite WILL NOT load properly. Make sure to load ALL your images before doing anything, or serious errors could occur.
@@ -278,6 +376,22 @@ ColliderList.prototype.addCollider = function(collider){
  * @param {int} y The starting y position of the sprite
  * @namespace Game
  * @constructor
+ */
+ 
+/**
+ * The x position to the sprite
+ *
+ * @property x
+ * @type Number
+ * @default "x"
+ */
+ 
+/**
+ * The y position to the sprite
+ *
+ * @property y
+ * @type Number
+ * @default "y"
  */
 function Sprite(image,x,y){
   this.image = image;
@@ -292,7 +406,6 @@ function Sprite(image,x,y){
   this.update();
 }
 util.inherits(Sprite,events.EventEmitter);
-// not documented yet
 Sprite.prototype.onSpriteListed = function(spriteList,colliderType){
   this.collision = new BoxCollider(spriteList,this.x,this.y,this.image.w,this.image.h,colliderType);
   this.collision.on('updateLocations',function(){
@@ -300,10 +413,25 @@ Sprite.prototype.onSpriteListed = function(spriteList,colliderType){
   }.bind(this));
 };
 
+/**
+ * Draws the sprite to the canvas provided
+ *
+ * @method draw
+ * @param {Canvas} canvas The canvas to draw to.
+ * @return
+ */
+ 
 Sprite.prototype.draw = function(canvas){
   this.image.draw(canvas,this.x,this.y);
 };
-// not documented yet
+
+/**
+ * Changes the image of the sprite to the one provided, or switches to a new image in this.image
+ *
+ * @method draw
+ * @param {Collider} collider The collider to add. It must comply with the collider rules.
+ * @return
+ */
 Sprite.prototype.update = function(image){
   this.canvas.clear();
   if(image) this.image = image;
@@ -383,6 +511,17 @@ function onTimerTick() {
   ev.out('update', 0.033);
   ev.out('draw');
 }
+
+
+
+
+/**
+ * A simple box collider. The format does not currently allow you to add custom colliders
+ *
+ * @class BoxCollider
+ * @namespace Game
+ * @static
+ */
 
 function BoxCollider(spriteList,x,y,w,h,colliderType){
   this.colliderList = spriteList.colliderList;
