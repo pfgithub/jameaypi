@@ -12,8 +12,13 @@ var o = 0;
 awaitImages([playerFacingRight,playerFacingLeft,floor],function(){
   var sprite = new Sprite(playerFacingLeft,10,10);
   screen.registerSprite(sprite, "object");
+  var rigidSprite = new Game.RigidBody(sprite,sprite.collision);
   var floorSprite = new Sprite(floor,10,300);
+  var floorSprite2 = new Sprite(floor,200,250);
+  var floorSprite3 = new Sprite(floor,200,10);
   screen.registerSprite(floorSprite, "background");
+  screen.registerSprite(floorSprite2, "background");
+  screen.registerSprite(floorSprite3, "background");
   sprite.do.jump = function(){
     direction['jump'] = true;
   };
@@ -22,6 +27,7 @@ awaitImages([playerFacingRight,playerFacingLeft,floor],function(){
   var velocityX = 0;
   
   var speed = 100;
+  var toJump;
   
   var direction = {};
   Game.events.on('keydown',function(key){
@@ -30,9 +36,7 @@ awaitImages([playerFacingRight,playerFacingLeft,floor],function(){
       sprite.image = playerFacingRight;
     }
     if(key == "up arrow"){
-      if(sprite.collision.colliding()){
-        velocity = -100;
-      }
+      toJump = true;
     }
     if(key == "left arrow"){
       direction['left'] = true;
@@ -43,26 +47,36 @@ awaitImages([playerFacingRight,playerFacingLeft,floor],function(){
     if(key == "left arrow"){
       direction['left'] = false;
     }
+    if(key == "up arrow"){
+      toJump = false;
+    }
     if(key == "right arrow"){
       direction['right'] = false;
     }
   });
   Game.events.on('update',function(deltaTime){
-    screen.clear();
-    //sprite.x += 100 * deltaTime;
-    if(direction['left']){
-      sprite.x -= speed * deltaTime;
+    if(direction.left){
+      rigidSprite.applyForce(-10,0);
     }
-    if(direction['right']){
-      sprite.x += speed * deltaTime;
+    if(direction.right){
+      rigidSprite.applyForce(10,0);
     }
-    sprite.y += velocity * deltaTime;
-    velocity += 5;
-    if(sprite.collision.onGround()){
-      velocity = 0;
+    rigidSprite.update(deltaTime);
+    
+    if(toJump){
+      if(rigidSprite.onGround){
+        rigidSprite.applyForce(0,-200);
+      }
     }
+    console.log(sprite.y);
+    if(sprite.y > screen.h){
+      rigidSprite.applyForce(0,-200);
+    }
+    screen.camera.x = -sprite.x + screen.w / 2 - sprite.image.w/2;
+    screen.camera.y = -sprite.y + screen.h / 2 - sprite.image.h/2;
   });
   Game.events.on('draw',function(){
+    screen.clear();
     screen.spriteList.draw(true);
   });
   Game.events.on('resize',function(){

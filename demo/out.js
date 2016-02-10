@@ -1032,12 +1032,11 @@ screen.style.top   = "0";
 screen.style.left   = "0";
 screen.style.width  = "100%";
 screen.style.height = "100%";
- 
+
 var buffer = document.createElement('canvas');
 
 buffer.width  = window.innerWidth;
 buffer.height = window.innerHeight;
-buffer.style.display = "none";
 
 function clone(obj) {
   if(obj === null || typeof(obj) !== 'object' || 'isActiveClone' in obj)
@@ -1066,6 +1065,9 @@ window.addEventListener("resize", function(){
   screen.width = w;
   screen.height = h;
   screen.getContext('2d').drawImage(buffer, 0, 0);
+  
+  screenObj.w = w;
+  screenObj.h = h;
   
   ev.out('resize');
 });
@@ -1113,6 +1115,11 @@ function Canvas(w,h){
   this.h = this.canvas.height;
   
   this.spriteList = new SpriteList(this);
+  
+  this.camera = {
+    x: 0,
+    y: 0
+  };
 }
 
 /**
@@ -1126,7 +1133,7 @@ function Canvas(w,h){
  */
 
 Canvas.prototype.drawImage = function(image,x,y){
-  try {this.ctx.drawImage(image.canvas, x,y);return true;}
+  try {this.ctx.drawImage(image.canvas, x+this.camera.x,y+this.camera.y);return true;}
   catch(err) {console.log('Could not draw canvas',image,err);return false;}
 };
 
@@ -1140,6 +1147,10 @@ Canvas.prototype.drawImage = function(image,x,y){
 
 Canvas.prototype.registerSprite = function(sprite,collisionType){
   this.spriteList.addSprite(sprite,collisionType);
+};
+
+Canvas.prototype.registerSprites = function(sprites,collisionType){
+  sprites.forEach(function(sprite){this.spriteList.addSprite(sprite,collisionType);});
 };
 
 Canvas.prototype.registerCollider = function(collider){
@@ -1399,6 +1410,7 @@ function BoxCollider(spriteList,x,y,w,h,colliderType){
   this.colliderList.addCollider(this);
 }
 util.inherits(BoxCollider,events.EventEmitter);
+
 BoxCollider.prototype.colliding = function(){
   this.emit('updateLocations');
   if(this.colliderType == "object"){
@@ -1418,6 +1430,7 @@ BoxCollider.prototype.colliding = function(){
     throw new Error("Collider type " + this.colliderList +" can not be on the ground. Remove this check");
   }
 };
+
 BoxCollider.prototype.update = function(x,y,w,h){
   this.x = x;
   this.y = y;
@@ -1425,6 +1438,48 @@ BoxCollider.prototype.update = function(x,y,w,h){
   this.h = h;
 };
 
+function RigidBody(sprite,collider){
+  this.sprite = sprite;
+  this.collider = collider;
+  
+  this.vx = 0;
+  this.vy = 0;
+}
+RigidBody.prototype.applyForce = function(x,y){
+  this.vx += x;
+  this.vy += y;
+};
+RigidBody.prototype.setForce = function(x,y){
+  this.vx = x;
+  this.vy = y;
+};
+RigidBody.prototype.update = function(deltaTime){
+  this.sprite.x += this.vx * deltaTime;
+  
+  if(this.collider.colliding()){
+    this.sprite.x -= this.vx * deltaTime;
+    this.vx = 0;
+  }
+  
+  this.sprite.y += this.vy * deltaTime;
+  
+  if(this.collider.colliding()){
+    this.sprite.y -= this.vy * deltaTime;
+    if(this.vy > 0)this.onGround = true;
+    this.vy = 0;
+  }else{
+    this.onGround = false;
+  }
+  
+  this.vy += 10;
+  if(this.vx > 0){
+    this.vx -= 5;
+    if(this.vx < 0) this.vx = 0;
+  }else if(this.vx < 0){
+    this.vx += 5;
+    if(this.vx > 0) this.vx = 0;
+  }
+};
 
 var ev = new Events();
 
@@ -1433,6 +1488,8 @@ module.exports.Canvas = Canvas;
 module.exports.screen = screenObj;
 module.exports.Sprite = Sprite;
 module.exports.SpriteList = SpriteList;
+module.exports.BoxCollider = BoxCollider;
+module.exports.RigidBody = RigidBody;
 module.exports.Image = Image;
 module.exports.awaitImages = awaitImages;
 module.exports.events = ev;
@@ -1592,15 +1649,22 @@ var o = 0;
 awaitImages([playerFacingRight,playerFacingLeft,floor],function(){
   var sprite = new Sprite(playerFacingLeft,10,10);
   screen.registerSprite(sprite, "object");
+  var rigidSprite = new Game.RigidBody(sprite,sprite.collision);
   var floorSprite = new Sprite(floor,10,300);
+  var floorSprite2 = new Sprite(floor,200,250);
+  var floorSprite3 = new Sprite(floor,200,10);
   screen.registerSprite(floorSprite, "background");
+  screen.registerSprite(floorSprite2, "background");
+  screen.registerSprite(floorSprite3, "background");
   sprite.do.jump = function(){
     direction['jump'] = true;
   };
   
   var velocity = 0;
+  var velocityX = 0;
   
   var speed = 100;
+  var toJump;
   
   var direction = {};
   Game.events.on('keydown',function(key){
@@ -1609,9 +1673,7 @@ awaitImages([playerFacingRight,playerFacingLeft,floor],function(){
       sprite.image = playerFacingRight;
     }
     if(key == "up arrow"){
-      if(sprite.collision.colliding()){
-        velocity = -100;
-      }
+      toJump = true;
     }
     if(key == "left arrow"){
       direction['left'] = true;
@@ -1622,26 +1684,36 @@ awaitImages([playerFacingRight,playerFacingLeft,floor],function(){
     if(key == "left arrow"){
       direction['left'] = false;
     }
+    if(key == "up arrow"){
+      toJump = false;
+    }
     if(key == "right arrow"){
       direction['right'] = false;
     }
   });
   Game.events.on('update',function(deltaTime){
-    screen.clear();
-    //sprite.x += 100 * deltaTime;
-    if(direction['left']){
-      sprite.x -= speed * deltaTime;
+    if(direction.left){
+      rigidSprite.applyForce(-10,0);
     }
-    if(direction['right']){
-      sprite.x += speed * deltaTime;
+    if(direction.right){
+      rigidSprite.applyForce(10,0);
     }
-    sprite.y += velocity * deltaTime;
-    velocity += 5;
-    if(sprite.collision.colliding()){
-      velocity = 0;
+    rigidSprite.update(deltaTime);
+    
+    if(toJump){
+      if(rigidSprite.onGround){
+        rigidSprite.applyForce(0,-200);
+      }
     }
+    console.log(sprite.y);
+    if(sprite.y > screen.h){
+      rigidSprite.applyForce(0,-200);
+    }
+    screen.camera.x = -sprite.x + screen.w / 2 - sprite.image.w/2;
+    screen.camera.y = -sprite.y + screen.h / 2 - sprite.image.h/2;
   });
   Game.events.on('draw',function(){
+    screen.clear();
     screen.spriteList.draw(true);
   });
   Game.events.on('resize',function(){
