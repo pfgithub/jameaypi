@@ -68,8 +68,14 @@ document.addEventListener('keyup',function(e){
   ev.out('keyup-'+key);
 });
 
+document.addEventListener('mousemove',function(e){
+  screenObj.mouseX = e.clientX;
+  screenObj.mouseY = e.clientY;
+  
+  ev.out('mousemove', e.clientX - screenObj.camera.x, e.clientY - screenObj.camera.y);
+});
+
 document.body.appendChild(screen);
-document.body.appendChild(buffer);
 
 function Events(){this.x = 0;}
 util.inherits(Events, events.EventEmitter);
@@ -133,6 +139,8 @@ function Canvas(w,h){
   this.spriteList = new SpriteList(this);
   
   this.camera = new Camera(0,0);
+  
+  this.ctx.imageSmoothingEnabled = false;
 }
 
 /**
@@ -145,8 +153,8 @@ function Canvas(w,h){
  * @return {Boolean} Weather the image drawing succeeded or not. If image drawing did not succeed, it is likley that the image was not loaded yet. Please use awaitImages to house your image loading.
  */
 
-Canvas.prototype.drawImage = function(image,x,y){
-  try {this.ctx.drawImage(image.canvas, x+this.camera.x,y+this.camera.y);return true;}
+Canvas.prototype.drawImage = function(image,x,y,w,h){
+  try {this.ctx.drawImage(image.canvas, x+this.camera.x,y+this.camera.y,w,h);return true;}
   catch(err) {console.log('Could not draw canvas',image,err);return false;}
 };
 
@@ -258,7 +266,7 @@ util.inherits(Image, events.EventEmitter);
  * @return
  */
 Image.prototype.draw = function(canvas, x, y){
-  canvas.drawImage(this,x,y);
+  canvas.drawImage(this,x,y,this.w,this.h);
 };
 function Size(w,h){
   this.w = w;
@@ -331,6 +339,12 @@ SpriteList.prototype.draw = function(update, canvas){
   }.bind(this));
   return true;
 };
+SpriteList.prototype.removeSprite= function(sprite){
+  this.sprites.forEach(function(sprie,i){
+    if(sprie == sprite) delete this.sprites[i];
+  });
+};
+
 
 /**
  * A list of colliders for easy collision detection
@@ -363,8 +377,8 @@ function Camera(x,y){
   this.y = y;
 }
 Camera.prototype.centerOn = function(sprite,canvas){
-  this.camera.x = -sprite.x + canvas.w / 2 - sprite.image.w/2;
-  this.camera.y = -sprite.y + canvas.h / 2 - sprite.image.h/2;
+  this.x = -sprite.x + canvas.w / 2 - sprite.image.w/2;
+  this.y = -sprite.y + canvas.h / 2 - sprite.image.h/2;
 };
 
 /**
@@ -407,7 +421,7 @@ function Sprite(image,x,y){
 }
 util.inherits(Sprite,events.EventEmitter);
 Sprite.prototype.onSpriteListed = function(spriteList,colliderType){
-  this.collision = new BoxCollider(spriteList,this.x,this.y,this.image.w,this.image.h,colliderType);
+  this.collision = new BoxCollider(spriteList,this.x,this.y,this.image.w,this.image.h,this,colliderType);
   this.collision.on('updateLocations',function(){
     this.collision.update(this.x,this.y,this.image.w,this.image.h);
   }.bind(this));
@@ -509,7 +523,7 @@ setInterval(onTimerTick, 33); // 33 milliseconds = ~ 30 frames per sec
 
 function onTimerTick() {
   ev.out('update', 0.033);
-  ev.out('draw');
+  ev.out('draw', 0.033);
 }
 
 
@@ -523,13 +537,14 @@ function onTimerTick() {
  * @static
  */
 
-function BoxCollider(spriteList,x,y,w,h,colliderType){
+function BoxCollider(spriteList,x,y,w,h,sprite,colliderType){
   this.colliderList = spriteList.colliderList;
   this.x = x;
   this.y = y;
   this.w = w;
   this.h = h;
   this.colliderType = colliderType ? colliderType : "background"; // none, background, or object
+  this.sprite = sprite;
   this.colliderList.addCollider(this);
 }
 util.inherits(BoxCollider,events.EventEmitter);
@@ -539,6 +554,7 @@ BoxCollider.prototype.colliding = function(){
   if(this.colliderType == "object"){
     var collided = this.colliderList.colliders.some(function(collider,i){
       if(collider == this) return false;
+      if(collider.colliderType == "trigger") {this.emit('trigger',collider);return false;}
       if(
         this.x < collider.x + collider.w &&
         this.x + this.w > collider.x &&
@@ -568,6 +584,7 @@ function RigidBody(sprite,collider){
   this.vx = 0;
   this.vy = 0;
 }
+util.inherits(RigidBody,events.EventEmitter);
 RigidBody.prototype.applyForce = function(x,y){
   this.vx += x;
   this.vy += y;
