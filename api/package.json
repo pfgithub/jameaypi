@@ -1,7 +1,7 @@
 {
   "name": "js-game-api",
-  "version": "1.2.1",
-  "description": "Javascript Game API with Sprites and 2d rigidbodies",
+  "version": "1.3.1",
+  "description": "Javascript Game API with Sprites and 2d rigidbodies and mice r us stores",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -19,5 +19,5 @@
     "url": "https://github.com/pfgithub/jameaypi/issues"
   },
   "homepage": "https://github.com/pfgithub/jameaypi#readme",
-  "tonicExample": "//js-game-api does NOT work on tonic. It is for browserify, which tonic does not support. Sorry."
+  "tonicExample": "//js-game-api does NOT work on tonic. It is for browserify, which tonic does not support. Sorry. "
 }

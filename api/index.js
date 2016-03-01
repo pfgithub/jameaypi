@@ -60,12 +60,14 @@ document.addEventListener('keydown',function(e){
   var key = keys[e.keyCode];
   ev.out('keydown', key);
   ev.out('keydown-'+key);
+  events.keyDown[key] = true;
 });
 
 document.addEventListener('keyup',function(e){
   var key = keys[e.keyCode];
   ev.out('keyup', key);
   ev.out('keyup-'+key);
+  events.keyDown[key] = false;
 });
 
 document.addEventListener('mousemove',function(e){
